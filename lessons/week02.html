@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2주차 — 선 제어 집중 훈련</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:#0f0f1a;color:#e8e8f0;padding:32px 16px}
+.page{max-width:900px;margin:0 auto}
+.week-header{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border:1px solid #3a3a5c;border-radius:16px;padding:28px 36px;margin-bottom:24px;position:relative;overflow:hidden}
+.week-header::before{content:'';position:absolute;top:-40%;right:-5%;width:280px;height:280px;background:radial-gradient(circle,rgba(110,66,193,.15) 0%,transparent 70%)}
+.week-badge{display:inline-block;background:rgba(110,66,193,.3);border:1px solid #6e42c1;color:#c4a8ff;font-size:11px;font-weight:600;padding:3px 12px;border-radius:20px;letter-spacing:1px;margin-bottom:10px}
+.week-header h1{font-size:26px;font-weight:700;color:#fff;margin-bottom:6px}
+.week-header p{font-size:14px;color:#8888aa}
+.week-meta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px 12px;font-size:12px;color:#aaaacc}
+.day-nav{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.day-btn{background:#1a1a30;border:1px solid #3a3a5c;color:#8888aa;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;transition:.2s}
+.day-btn:hover,.day-btn.active{background:#6e42c1;border-color:#6e42c1;color:#fff}
+.day-section{display:none}
+.day-section.active{display:block}
+.card{background:#141428;border:1px solid #2a2a45;border-radius:12px;padding:24px;margin-bottom:18px}
+.lbl{font-size:10px;font-weight:700;letter-spacing:2px;color:#6e42c1;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.lbl::after{content:'';flex:1;height:1px;background:rgba(110,66,193,.3)}
+.goal-card{background:linear-gradient(135deg,#1e1e35,#252540);border:1px solid #6e42c1;border-left:4px solid #6e42c1;border-radius:12px;padding:20px 24px;margin-bottom:18px}
+.goal-text{font-size:16px;color:#e8e8ff;line-height:1.7}
+.goal-text strong{color:#c4a8ff}
+.card p,.card li{font-size:13px;line-height:1.8;color:#c0c0d8}
+.card ul{padding-left:18px;margin-top:6px}
+.img-block{margin:16px 0;border-radius:10px;overflow:hidden;border:1px solid #2a2a45}
+.img-cap{background:#1a1a30;border-bottom:1px solid #2a2a45;padding:7px 14px;font-size:11px;color:#6666aa}
+.img-block img{width:100%;display:block;background:#0d0d1a;max-height:400px;object-fit:contain}
+.img-src{background:#0f0f20;padding:4px 14px;font-size:10px;color:#444466;text-align:right}
+.ph{height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#444466;font-size:12px;background:#0d0d20;border:2px dashed #2a2a45;border-radius:8px;margin:12px 0}
+.ph span:first-child{font-size:28px;opacity:.5}
+.info{background:rgba(255,200,0,.05);border:1px solid rgba(255,200,0,.2);border-left:3px solid #ffc800;border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13px;color:#ccaa50;line-height:1.6}
+.info strong{color:#ffd844}
+.steps{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.snum{flex-shrink:0;width:26px;height:26px;background:linear-gradient(135deg,#6e42c1,#4a2d8a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-top:1px}
+.scont{flex:1;font-size:13px;color:#c0c0d8;line-height:1.7}
+.scont strong{color:#e8e8ff}
+.sub{margin-top:6px;padding:8px 12px;background:rgba(110,66,193,.08);border-left:3px solid #6e42c1;border-radius:0 6px 6px 0;font-size:12px;color:#aaaacc;line-height:1.6}
+.kwrow{background:#141428;border:1px solid #2a2a45;border-radius:10px;padding:14px 20px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.kwlbl{font-size:11px;color:#6666aa;white-space:nowrap}
+.tag{background:rgba(110,66,193,.15);border:1px solid rgba(110,66,193,.4);color:#c4a8ff;font-size:11px;padding:3px 10px;border-radius:16px;font-family:monospace}
+.assign{background:linear-gradient(135deg,#0f2027,#1a1a35);border:1px solid #4a8060;border-radius:12px;padding:20px 24px;margin-bottom:18px}
+.assign .lbl{color:#4aaa80}
+.assign .lbl::after{background:rgba(74,170,128,.3)}
+.atext{font-size:14px;color:#e8e8f0;line-height:1.7;margin-bottom:12px}
+.cbox{background:rgba(74,170,128,.08);border:1px solid rgba(74,170,128,.3);border-radius:8px;padding:12px 16px}
+.ctitle{font-size:11px;color:#4aaa80;font-weight:600;margin-bottom:8px}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;list-style:none}
+.cgrid li{font-size:12px;color:#aaccaa;display:flex;align-items:center;gap:5px}
+.cgrid li::before{content:'▸';color:#4aaa80;font-size:9px}
+.footer{display:flex;justify-content:space-between;margin-top:32px;padding:14px 0;border-top:1px solid #2a2a45;font-size:11px;color:#4a4a70}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="week-header">
+  <div class="week-badge">WEEK 02</div>
+  <h1>선 제어 집중 훈련</h1>
+  <p>어떤 방향이든, 어떤 길이든 원하는 선을 원하는 자리에 긋는 능력 습득</p>
+  <div class="week-meta">
+    <div class="chip">📌 Phase 1</div>
+    <div class="chip">⏱ 평일 3h / 주말 4h</div>
+    <div class="chip">🔑 선 품질은 속도에서 나온다</div>
+  </div>
+</div>
+
+<div class="day-nav">
+  <button class="day-btn active" onclick="showDay(1)">1일차</button>
+  <button class="day-btn" onclick="showDay(2)">2일차</button>
+  <button class="day-btn" onclick="showDay(3)">3일차</button>
+  <button class="day-btn" onclick="showDay(4)">4일차</button>
+  <button class="day-btn" onclick="showDay(5)">5일차</button>
+  <button class="day-btn" onclick="showDay(6)">6일차 🌙</button>
+  <button class="day-btn" onclick="showDay(7)">7일차 🌙</button>
+</div>
+
+<!-- DAY 1 -->
+<div class="day-section active" id="day1">
+<div class="goal-card"><div class="lbl">🎯 1일차 목표</div>
+<div class="goal-text">어떤 방향의 직선도 가이드 없이 <strong>일필휘지로 긋기</strong>. 선의 시작과 끝을 컨트롤하기.</div></div>
+<div class="card"><div class="lbl">📖 선을 못 긋는 이유 TOP 3</div>
+<div class="img-block">
+  <div class="img-cap">✏️ CSP 선 안정화 및 스트로크 기법</div>
+  <img src="https://www.clipstudio.net/wp-content/uploads/2019/09/0020_001en-us.jpg" alt="선 제어 튜토리얼" loading="lazy">
+  <div class="img-src">출처: clipstudio.net</div>
+</div>
+<p><strong style="color:#e8e8ff">1위. 손목만 쓴다</strong></p>
+<p style="margin:4px 0 12px">긴 직선은 팔꿈치 또는 어깨를 축으로 팔 전체가 움직여야 한다. 지금 팔꿈치를 들고 팔 전체로 선을 그어보라.</p>
+<p><strong style="color:#e8e8ff">2위. 너무 천천히 긋는다</strong></p>
+<p style="margin:4px 0 12px">천천히 = 손 떨림이 고스란히 기록됨. 무서워도 빠르게. 위치는 연습으로 잡히지만 속도는 의식하지 않으면 절대 안 붙는다.</p>
+<p><strong style="color:#e8e8ff">3위. 캔버스 각도를 고정한다</strong></p>
+<p style="margin:4px 0">불편한 방향을 억지로 긋지 말고, R키로 캔버스를 편한 방향으로 회전해서 그어라.</p>
+<div class="info">💡 <strong>입필 → 질주 → 발필 3단계:</strong> 시작점 살짝 눌러 얇게 → 빠르게 질주 → 끝에서 들어올리며 마무리</div>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>가이드 점 있는 선 (1시간)</strong><div class="sub">시작점·끝점 찍고 잇기 × 50회. 매 10회마다 H키 확인.</div></div></div>
+  <div class="step"><div class="snum">2</div><div class="scont"><strong>방향별 직선 (1시간)</strong><div class="sub">수평 30개 / 수직 30개 / 45도 사선 30개 / 불편한 방향 (캔버스 회전 활용) 30개.</div></div></div>
+  <div class="step"><div class="snum">3</div><div class="scont"><strong>강약 있는 선 (1시간)</strong><div class="sub">양 끝 뾰족·가운데 굵은 선 30개 / 한쪽만 뾰족 30개.</div></div></div>
+</div></div>
+<div class="kwrow"><span class="kwlbl">🖼️ 키워드</span><span class="tag">anime linework technique</span><span class="tag">CSP line stabilizer</span></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">강약 있는 선 연습 시트 제출. <strong>처음 10개와 마지막 10개의 차이가 눈에 보여야</strong> 통과.</div></div>
+</div>
+
+<!-- DAY 2 -->
+<div class="day-section" id="day2">
+<div class="goal-card"><div class="lbl">🎯 2일차 목표</div>
+<div class="goal-text">C곡선, S곡선, 원, 타원을 <strong>정확하고 자신 있게</strong> 그리기. 원 그리기는 두상 구조로 직결된다.</div></div>
+<div class="card"><div class="lbl">📖 곡선 & 원 그리기</div>
+<p>원 그리기의 비밀: 팔꿈치를 축으로 팔 전체를 회전. 손목이 아니다. 처음엔 크게, 점점 작게.</p>
+<ul style="margin:10px 0 0 18px">
+  <li>C곡선: 한 방향으로 휘는 단순 곡선</li>
+  <li>S곡선: 방향이 한 번 바뀌는 곡선 (머리카락 흐름에 핵심)</li>
+  <li>원: 빠르게 돌리는 느낌으로 — 완벽하지 않아도 됨</li>
+  <li>타원: 원을 눌러놓은 것 — 각도에 따라 찌그러짐 방향 의식</li>
+</ul>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>C곡선 50개 (30분)</strong><div class="sub">크기 다양하게. H키로 비교.</div></div></div>
+  <div class="step"><div class="snum">2</div><div class="scont"><strong>S곡선 50개 (30분)</strong></div></div>
+  <div class="step"><div class="snum">3</div><div class="scont"><strong>원 50개 (1시간)</strong><div class="sub">크기 다양하게. 처음엔 크게 (팔꿈치 축), 점점 작게 (손목 축).</div></div></div>
+  <div class="step"><div class="snum">4</div><div class="scont"><strong>타원 50개 (1시간)</strong><div class="sub">각도별로: 정면 타원 / 45도 기울어진 타원 / 좁고 긴 타원.</div></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">원 연습 시트 제출. 처음 10개와 마지막 10개 비교해서 차이 확인.</div></div>
+</div>
+
+<!-- DAY 3 -->
+<div class="day-section" id="day3">
+<div class="goal-card"><div class="lbl">🎯 3일차 목표</div>
+<div class="goal-text">선의 <strong>굵기 변화(강약)</strong>와 <strong>윤곽선 표현</strong>으로 입체감 만들기.</div></div>
+<div class="card"><div class="lbl">📖 선의 강약과 윤곽선</div>
+<p>애니 선화에서 선의 굵기 규칙:</p>
+<ul style="margin:10px 0 0 18px">
+  <li><strong style="color:#e8e8ff">외곽선</strong>: 가장 굵게 (캐릭터를 배경에서 분리)</li>
+  <li><strong style="color:#e8e8ff">옷 주름선</strong>: 중간 굵기</li>
+  <li><strong style="color:#e8e8ff">얼굴 내부선</strong>: 가장 얇게</li>
+  <li><strong style="color:#e8e8ff">선 끝처리</strong>: 가늘게 끝나야 자연스러움</li>
+</ul>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>굵기 차이 선 연습 (1시간)</strong><div class="sub">같은 길이의 선을 3가지 굵기로 나란히 30세트.</div></div></div>
+  <div class="step"><div class="snum">2</div><div class="scont"><strong>도형 윤곽선 (2시간)</strong><div class="sub">원, 사각형, 자유 형태 → 외곽선 굵게 + 내부선 얇게 표현 연습.</div></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">굵기 차이가 있는 도형 윤곽선 연습 시트 제출.</div></div>
+</div>
+
+<!-- DAY 4 -->
+<div class="day-section" id="day4">
+<div class="goal-card"><div class="lbl">🎯 4일차 목표</div>
+<div class="goal-text">머리카락 흐름 선화 — <strong>S커브와 뭉침 표현</strong>으로 자연스러운 헤어 선화.</div></div>
+<div class="card"><div class="lbl">📖 머리카락 선화 원리</div>
+<p>머리카락 그리기 순서:</p>
+<ul style="margin:10px 0 0 18px">
+  <li>① 전체 덩어리 실루엣 (큰 S커브)</li>
+  <li>② 흐름선 3~5개 (덩어리 방향)</li>
+  <li>③ 세부 가닥 (흐름선 방향 따라가며)</li>
+  <li>④ 끝 가닥 뾰족하게 마무리</li>
+</ul>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>머리카락 흐름선 연습 (1시간)</strong><div class="sub">위에서 아래로 흐르는 S커브 × 30개.</div></div></div>
+  <div class="step"><div class="snum">2</div><div class="scont"><strong>머리카락 덩어리 표현 (2시간)</strong><div class="sub">간단한 두상 러프 위에 머리카락 선화 3~5개.</div></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">머리카락 선화 연습 3개 제출 (다른 스타일 — 생머리/웨이브/짧은 머리).</div></div>
+</div>
+
+<!-- DAY 5 -->
+<div class="day-section" id="day5">
+<div class="goal-card"><div class="lbl">🎯 5일차 목표</div>
+<div class="goal-text">이번 주 배운 선 기술로 <strong>얼굴 러프 선화</strong> 1장 완성.</div></div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>얼굴 러프 → 선화 (3시간)</strong><div class="sub">① 원으로 두상 잡기 → ② 이목구비 위치 잡기 → ③ 선화 작업<br>외곽선 굵게, 내부선 얇게. H키 수시로 확인.</div></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">얼굴 러프 선화 1장 제출. 선 굵기 차이가 보여야 함.</div>
+<div class="cbox"><div class="ctitle">✅ 합격 기준</div>
+<ul class="cgrid"><li>외곽선/내부선 굵기 차이</li><li>선이 끊기지 않음</li><li>전반적 선 안정성</li><li>H키 확인 흔적</li></ul></div></div>
+</div>
+
+<!-- DAY 6 -->
+<div class="day-section" id="day6">
+<div class="goal-card"><div class="lbl">🎯 6일차 목표 (주말)</div>
+<div class="goal-text">이번 주 선 기술 집중 완성 — <strong>더 완성도 높은 선화</strong> 1장.</div></div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>스타레일/명조 캐릭터 선 분석 (1시간)</strong><div class="sub">선화 특징 분석: 어떤 선이 굵고 얇은지 확인.</div></div></div>
+  <div class="step"><div class="snum">2</div><div class="scont"><strong>선화 집중 완성 (3시간)</strong><div class="sub">얼굴+머리카락 선화 완성본 1장.</div></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">얼굴+머리카락 선화 완성본 제출 (5일차 선화보다 완성도 높아야 함).</div></div>
+</div>
+
+<!-- DAY 7 -->
+<div class="day-section" id="day7">
+<div class="goal-card"><div class="lbl">🎯 7일차 목표 (주말)</div>
+<div class="goal-text">자유 선화 연습 + 다음 주 두상 구조 <strong>사전 탐색</strong>.</div></div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>자유 선화 (2시간)</strong><div class="sub">그리고 싶은 것 자유롭게. 단축키 최대한 활용.</div></div></div>
+  <div class="step"><div class="snum">2</div><div class="scont"><strong>두상 사전 탐색 (2시간)</strong><div class="sub">정면/측면/3/4면 두상 각 1개씩 그려보기 (지금 실력 그대로, 정답 없음).</div></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">자유 선화 1장 + 두상 3방향 사전 스케치 제출 (현재 실력 파악 목적, 완성도 무관).</div></div>
+</div>
+
+<div class="footer"><span>일러스트 강사봇 · 스타레일/명조 스타일 17주 과정</span><span>2주차 / 17주</span></div>
+</div>
+<script>
+function showDay(n){
+  document.querySelectorAll('.day-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('day'+n).classList.add('active');
+  document.querySelectorAll('.day-btn')[n-1].classList.add('active');
+}
+</script>
+</body>
+</html>

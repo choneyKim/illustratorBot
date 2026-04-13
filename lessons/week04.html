@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4주차 — 애니 눈 집중</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:#0f0f1a;color:#e8e8f0;padding:32px 16px}
+.page{max-width:900px;margin:0 auto}
+.week-header{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border:1px solid #3a3a5c;border-radius:16px;padding:28px 36px;margin-bottom:24px;position:relative;overflow:hidden}
+.week-header::before{content:'';position:absolute;top:-40%;right:-5%;width:280px;height:280px;background:radial-gradient(circle,rgba(110,66,193,.15) 0%,transparent 70%)}
+.week-badge{display:inline-block;background:rgba(110,66,193,.3);border:1px solid #6e42c1;color:#c4a8ff;font-size:11px;font-weight:600;padding:3px 12px;border-radius:20px;letter-spacing:1px;margin-bottom:10px}
+.week-header h1{font-size:26px;font-weight:700;color:#fff;margin-bottom:6px}
+.week-header p{font-size:14px;color:#8888aa}
+.week-meta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px 12px;font-size:12px;color:#aaaacc}
+.day-nav{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.day-btn{background:#1a1a30;border:1px solid #3a3a5c;color:#8888aa;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;transition:.2s}
+.day-btn:hover,.day-btn.active{background:#6e42c1;border-color:#6e42c1;color:#fff}
+.day-section{display:none}.day-section.active{display:block}
+.card{background:#141428;border:1px solid #2a2a45;border-radius:12px;padding:24px;margin-bottom:18px}
+.lbl{font-size:10px;font-weight:700;letter-spacing:2px;color:#6e42c1;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.lbl::after{content:'';flex:1;height:1px;background:rgba(110,66,193,.3)}
+.goal-card{background:linear-gradient(135deg,#1e1e35,#252540);border:1px solid #6e42c1;border-left:4px solid #6e42c1;border-radius:12px;padding:20px 24px;margin-bottom:18px}
+.goal-text{font-size:16px;color:#e8e8ff;line-height:1.7}.goal-text strong{color:#c4a8ff}
+.card p,.card li{font-size:13px;line-height:1.8;color:#c0c0d8}
+.card ul{padding-left:18px;margin-top:6px}
+.img-block{margin:16px 0;border-radius:10px;overflow:hidden;border:1px solid #2a2a45}
+.img-cap{background:#1a1a30;border-bottom:1px solid #2a2a45;padding:7px 14px;font-size:11px;color:#6666aa}
+.img-block img{width:100%;display:block;background:#0d0d1a;max-height:420px;object-fit:contain}
+.img-src{background:#0f0f20;padding:4px 14px;font-size:10px;color:#444466;text-align:right}
+.layer-stack{background:#0d0d20;border:1px solid #2a2a45;border-radius:8px;padding:14px 18px;margin:12px 0;font-family:monospace;font-size:13px;color:#c4a8ff;line-height:1.9}
+.info{background:rgba(255,200,0,.05);border:1px solid rgba(255,200,0,.2);border-left:3px solid #ffc800;border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13px;color:#ccaa50;line-height:1.6}
+.info strong{color:#ffd844}
+.steps{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.snum{flex-shrink:0;width:26px;height:26px;background:linear-gradient(135deg,#6e42c1,#4a2d8a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-top:1px}
+.scont{flex:1;font-size:13px;color:#c0c0d8;line-height:1.7}.scont strong{color:#e8e8ff}
+.sub{margin-top:6px;padding:8px 12px;background:rgba(110,66,193,.08);border-left:3px solid #6e42c1;border-radius:0 6px 6px 0;font-size:12px;color:#aaaacc;line-height:1.6}
+.kwrow{background:#141428;border:1px solid #2a2a45;border-radius:10px;padding:14px 20px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.kwlbl{font-size:11px;color:#6666aa;white-space:nowrap}
+.tag{background:rgba(110,66,193,.15);border:1px solid rgba(110,66,193,.4);color:#c4a8ff;font-size:11px;padding:3px 10px;border-radius:16px;font-family:monospace}
+.assign{background:linear-gradient(135deg,#0f2027,#1a1a35);border:1px solid #4a8060;border-radius:12px;padding:20px 24px;margin-bottom:18px}
+.assign .lbl{color:#4aaa80}.assign .lbl::after{background:rgba(74,170,128,.3)}
+.atext{font-size:14px;color:#e8e8f0;line-height:1.7;margin-bottom:12px}
+.cbox{background:rgba(74,170,128,.08);border:1px solid rgba(74,170,128,.3);border-radius:8px;padding:12px 16px}
+.ctitle{font-size:11px;color:#4aaa80;font-weight:600;margin-bottom:8px}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;list-style:none}
+.cgrid li{font-size:12px;color:#aaccaa;display:flex;align-items:center;gap:5px}
+.cgrid li::before{content:'▸';color:#4aaa80;font-size:9px}
+.footer{display:flex;justify-content:space-between;margin-top:32px;padding:14px 0;border-top:1px solid #2a2a45;font-size:11px;color:#4a4a70}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="week-header">
+  <div class="week-badge">WEEK 04</div>
+  <h1>애니 눈 집중</h1>
+  <p>스타레일/명조 스타일 눈을 단계별로 완벽하게 그리기</p>
+  <div class="week-meta">
+    <div class="chip">📌 Phase 2</div>
+    <div class="chip">⏱ 평일 3h / 주말 4h</div>
+    <div class="chip">👁️ 감정의 70%는 눈에서</div>
+  </div>
+</div>
+
+<div class="day-nav">
+  <button class="day-btn active" onclick="showDay(1)">1일차</button>
+  <button class="day-btn" onclick="showDay(2)">2일차</button>
+  <button class="day-btn" onclick="showDay(3)">3일차</button>
+  <button class="day-btn" onclick="showDay(4)">4일차</button>
+  <button class="day-btn" onclick="showDay(5)">5일차</button>
+  <button class="day-btn" onclick="showDay(6)">6일차 🌙</button>
+  <button class="day-btn" onclick="showDay(7)">7일차 🌙</button>
+</div>
+
+<!-- DAY 1 -->
+<div class="day-section active" id="day1">
+<div class="goal-card"><div class="lbl">🎯 1일차 목표</div>
+<div class="goal-text">애니 눈의 <strong>구성 요소</strong> 이해 + 기본 형태 완성.</div></div>
+<div class="card"><div class="lbl">📖 애니 눈의 구조</div>
+<div class="img-block">
+  <div class="img-cap">👁️ 애니 눈 그리기 튜토리얼 (clipstudio.net)</div>
+  <img src="https://www.clipstudio.net/wp-content/uploads/2020/09/0138_000_en-us.jpg" alt="애니 눈 그리기" loading="lazy">
+  <div class="img-src">출처: clipstudio.net</div>
+</div>
+<div class="img-block">
+  <div class="img-cap">👁️ 눈 그리기 상세 단계</div>
+  <img src="https://www.clipstudio.net/wp-content/uploads/2020/09/0138_001.png" alt="눈 그리기 단계" loading="lazy">
+  <div class="img-src">출처: clipstudio.net</div>
+</div>
+<p>애니 눈 구성 요소:</p>
+<ul style="margin:10px 0 0 18px">
+  <li><strong style="color:#e8e8ff">눈꺼풀 라인(위)</strong>: 두껍고 짙은 선 — 가장 중요</li>
+  <li><strong style="color:#e8e8ff">눈꺼풀 라인(아래)</strong>: 얇은 선 또는 점선</li>
+  <li><strong style="color:#e8e8ff">홍채</strong>: 크고 둥글고 컬러풀</li>
+  <li><strong style="color:#e8e8ff">동공</strong>: 홍채 안의 세로 타원</li>
+  <li><strong style="color:#e8e8ff">속눈썹</strong>: 위 눈꺼풀에 붙은 덩어리형</li>
+  <li><strong style="color:#e8e8ff">하이라이트</strong>: 1~2개의 흰 원형 — 생동감의 핵심</li>
+</ul>
+<div class="info">💡 <strong>스타레일 눈 특징:</strong> 세로로 긴 편, 눈꺼풀이 두껍고 강함, 홍채에 그라데이션 많음.</div>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>구성 요소 각각 따로 연습 (1시간)</strong><div class="sub">눈꺼풀 / 홍채 / 속눈썹 각각 10개씩.</div></div></div>
+  <div class="step"><div class="snum">2</div><div class="scont"><strong>기본 눈 형태 5개 (1시간)</strong></div></div>
+  <div class="step"><div class="snum">3</div><div class="scont"><strong>스타레일 캐릭터 눈 3개 트레이싱 (1시간)</strong><div class="sub">트레이싱 후 구성 요소 분석 메모.</div></div></div>
+</div></div>
+<div class="kwrow"><span class="kwlbl">🖼️ 키워드</span><span class="tag">anime eye drawing tutorial</span><span class="tag">Honkai Star Rail eye style</span></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">기본 눈 형태 (구성 요소 레이블 포함) 2개 제출.</div></div>
+</div>
+
+<!-- DAY 2 -->
+<div class="day-section" id="day2">
+<div class="goal-card"><div class="lbl">🎯 2일차 목표</div>
+<div class="goal-text">눈만으로 <strong>6가지 감정</strong> 표현.</div></div>
+<div class="card"><div class="lbl">📖 눈 표정 변화</div>
+<p>눈꺼풀의 기울기와 위치가 감정을 결정한다:</p>
+<ul style="margin:10px 0 0 18px">
+  <li>기쁨: 눈꺼풀이 약간 내려와서 초승달 모양</li>
+  <li>슬픔: 눈꺼풀 안쪽이 올라감, 눈 전체가 아래로</li>
+  <li>화남: 눈꺼풀 바깥이 내려옴, 미간 주름</li>
+  <li>놀람: 눈이 크게 열림, 눈꺼풀 올라감</li>
+  <li>부끄러움: 눈을 피하는 느낌, 반쯤 내리깔기</li>
+  <li>냉정함: 눈꺼풀 내려옴, 눈이 약간 가늘어짐</li>
+</ul>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>6가지 감정 눈 (3시간)</strong><div class="sub">기본 눈 완성 후 각 감정별 변형. 스타레일 표정 스크린샷과 비교.</div></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">6가지 감정 눈 표현 시트 제출.</div></div>
+</div>
+
+<!-- DAY 3 -->
+<div class="day-section" id="day3">
+<div class="goal-card"><div class="lbl">🎯 3일차 목표</div>
+<div class="goal-text">3/4면, 측면에서 <strong>눈 형태 변화</strong> 이해.</div></div>
+<div class="card"><div class="lbl">📖 눈 각도 변화</div>
+<p>3/4면: 먼 쪽 눈이 좁아짐 (원근) / 곡선 방향이 안쪽으로 바뀜</p>
+<p style="margin-top:8px">측면: 눈이 V자 또는 꺾인 선으로 단순화 / 속눈썹이 앞으로 나온 것처럼 보임</p>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>3방향 눈 비교표 (3시간)</strong><div class="sub">정면 / 3/4면(좌우 각 3개) / 측면 3개 → 나란히 배치.</div></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">3방향 눈 비교표 제출.</div></div>
+</div>
+
+<!-- DAY 4 -->
+<div class="day-section" id="day4">
+<div class="goal-card"><div class="lbl">🎯 4일차 목표</div>
+<div class="goal-text">스타레일 스타일 <strong>눈 홍채 채색</strong> 완성 (색상 포함).</div></div>
+<div class="card"><div class="lbl">📖 홍채와 하이라이트</div>
+<p>스타레일 스타일 홍채 특징: 위는 어둡고 아래는 밝음 / 그라데이션 / 하이라이트 2~3개</p>
+<div class="layer-stack">
+  ▲ 하이라이트<br>
+  ▲ 반짝임<br>
+  ▲ 밝은 그라데이션<br>
+  ▲ 기본 홍채색<br>
+  ▲ 어두운 그라데이션<br>
+  ▲ 동공<br>
+  ▲ 흰자
+</div>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>눈 선화 2개 완성 (1시간)</strong></div></div>
+  <div class="step"><div class="snum">2</div><div class="scont"><strong>레이어 구조대로 채색 (2시간)</strong><div class="sub">좋아하는 스타레일 캐릭터 눈 색상 참고.</div></div></div>
+</div></div>
+<div class="kwrow"><span class="kwlbl">🖼️ 키워드</span><span class="tag">anime eye coloring tutorial CSP</span><span class="tag">스타레일 눈 채색</span></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">채색 완성된 눈 2개 제출 (레이어 구조 스크린샷 포함).</div></div>
+</div>
+
+<!-- DAY 5 -->
+<div class="day-section" id="day5">
+<div class="goal-card"><div class="lbl">🎯 5일차 목표</div>
+<div class="goal-text">눈썹과 속눈썹의 <strong>표현 완성</strong>.</div></div>
+<div class="card"><div class="lbl">📖 눈썹과 속눈썹</div>
+<p>눈썹은 눈보다 감정 전달에 더 큰 역할을 한다. 눈썹 각도 하나로 완전히 다른 성격이 된다.</p>
+<ul style="margin:10px 0 0 18px">
+  <li>남성 캐릭터: 두껍고 각짐</li>
+  <li>여성 캐릭터: 가늘고 자연스러운 아치</li>
+  <li>속눈썹: 한 올씩이 아닌 덩어리로, 끝이 아래/바깥으로</li>
+</ul>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>눈썹 형태 6종 (1시간)</strong><div class="sub">강함/부드러움/기울기 다양하게.</div></div></div>
+  <div class="step"><div class="snum">2</div><div class="scont"><strong>눈+눈썹+속눈썹 통합 눈 3개 (2시간)</strong></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">눈+눈썹+속눈썹 통합 완성 눈 3개 제출.</div>
+<div class="cbox"><div class="ctitle">✅ 합격 기준</div>
+<ul class="cgrid"><li>눈썹 형태 자연스러움</li><li>속눈썹 덩어리 표현</li><li>눈꺼풀 두께 표현</li><li>하이라이트 포함</li></ul></div></div>
+</div>
+
+<!-- DAY 6 -->
+<div class="day-section" id="day6">
+<div class="goal-card"><div class="lbl">🎯 6일차 목표 (주말)</div>
+<div class="goal-text">원하는 스타레일/명조 캐릭터의 눈을 <strong>최고 완성도로 재현</strong>.</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">원하는 스타레일/명조 캐릭터의 눈 최고 완성도 재현 (채색 포함) 제출.</div></div>
+</div>
+
+<!-- DAY 7 -->
+<div class="day-section" id="day7">
+<div class="goal-card"><div class="lbl">🎯 7일차 목표 (주말)</div>
+<div class="goal-text">3주차 두상에 <strong>이번 주 눈 기술 적용</strong>.</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">3주차에 그린 두상에 이번 주 눈 기술을 적용한 얼굴 1장 제출.</div></div>
+</div>
+
+<div class="footer"><span>일러스트 강사봇 · 스타레일/명조 스타일 17주 과정</span><span>4주차 / 17주</span></div>
+</div>
+<script>
+function showDay(n){
+  document.querySelectorAll('.day-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('day'+n).classList.add('active');
+  document.querySelectorAll('.day-btn')[n-1].classList.add('active');
+}
+</script>
+</body>
+</html>

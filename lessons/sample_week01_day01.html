@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1주차 1일차 — CSP 인터페이스 완전 정복</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #0f0f1a;
+    color: #e8e8f0;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .page { max-width: 900px; margin: 0 auto; }
+
+  /* 헤더 */
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border: 1px solid #3a3a5c;
+    border-radius: 16px;
+    padding: 32px 40px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%; right: -10%;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(110,66,193,0.15) 0%, transparent 70%);
+  }
+  .header-badge {
+    display: inline-block;
+    background: rgba(110,66,193,0.3);
+    border: 1px solid #6e42c1;
+    color: #c4a8ff;
+    font-size: 12px; font-weight: 500;
+    padding: 4px 12px; border-radius: 20px;
+    letter-spacing: 1px; margin-bottom: 12px;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .header-sub { font-size: 15px; color: #8888aa; }
+  .header-meta { display: flex; gap: 16px; margin-top: 20px; flex-wrap: wrap; }
+  .meta-chip {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 6px 14px;
+    font-size: 13px; color: #aaaacc;
+  }
+
+  /* 섹션 레이블 */
+  .section-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: #6e42c1; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px;
+    background: rgba(110,66,193,0.3);
+  }
+
+  /* 목표 카드 */
+  .goal-card {
+    background: linear-gradient(135deg, #1e1e35, #252540);
+    border: 1px solid #6e42c1;
+    border-left: 4px solid #6e42c1;
+    border-radius: 12px; padding: 24px 28px; margin-bottom: 24px;
+  }
+  .goal-text { font-size: 17px; color: #e8e8ff; line-height: 1.7; }
+  .goal-text strong { color: #c4a8ff; }
+
+  /* 카드 공통 */
+  .card {
+    background: #141428;
+    border: 1px solid #2a2a45;
+    border-radius: 12px; padding: 28px; margin-bottom: 24px;
+  }
+  .card h3 { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 16px; }
+  .card p, .card li { font-size: 14px; line-height: 1.8; color: #c0c0d8; }
+
+  /* 실제 이미지 */
+  .img-block {
+    margin: 20px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #2a2a45;
+  }
+  .img-caption {
+    background: #1a1a30;
+    border-bottom: 1px solid #2a2a45;
+    padding: 8px 14px;
+    font-size: 11px; color: #6666aa;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .img-block img {
+    width: 100%;
+    display: block;
+    background: #0d0d1a;
+  }
+  .img-source {
+    background: #0f0f20;
+    padding: 5px 14px;
+    font-size: 10px; color: #444466;
+    text-align: right;
+  }
+
+  /* 테이블 */
+  table {
+    width: 100%; border-collapse: collapse;
+    margin: 16px 0; font-size: 13px;
+  }
+  th {
+    background: #1e1e35; color: #8888cc; font-weight: 500;
+    padding: 10px 14px; text-align: left;
+    border-bottom: 1px solid #2a2a45; font-size: 12px;
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #1a1a30;
+    color: #c0c0d8; vertical-align: middle;
+  }
+  tr:hover td { background: rgba(110,66,193,0.05); }
+  .key {
+    display: inline-block;
+    background: #1e1e35; border: 1px solid #4a4a70;
+    border-radius: 5px; padding: 2px 10px;
+    font-family: monospace; font-size: 13px; color: #c4a8ff;
+  }
+  .star td { color: #ffd700; }
+  .star td:first-child .key { color: #c4a8ff; }
+  .star .note { color: #ffd07a; }
+
+  /* 인포박스 */
+  .info-box {
+    background: rgba(255,200,0,0.05);
+    border: 1px solid rgba(255,200,0,0.2);
+    border-left: 3px solid #ffc800;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px; margin: 16px 0;
+    font-size: 13px; color: #ccaa50; line-height: 1.6;
+  }
+  .info-box strong { color: #ffd844; }
+
+  /* 실습 스텝 */
+  .step-list { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+  .step-item { display: flex; gap: 16px; align-items: flex-start; }
+  .step-num {
+    flex-shrink: 0; width: 28px; height: 28px;
+    background: linear-gradient(135deg, #6e42c1, #4a2d8a);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff; margin-top: 1px;
+  }
+  .step-content { flex: 1; font-size: 14px; color: #c0c0d8; line-height: 1.7; }
+  .step-content strong { color: #e8e8ff; }
+  .step-sub {
+    margin-top: 8px; padding: 10px 14px;
+    background: rgba(110,66,193,0.08);
+    border-left: 3px solid #6e42c1;
+    border-radius: 0 6px 6px 0;
+    font-size: 13px; color: #aaaacc; line-height: 1.6;
+  }
+
+  /* 키워드 */
+  .keyword-row {
+    background: #141428; border: 1px solid #2a2a45;
+    border-radius: 12px; padding: 16px 24px; margin-bottom: 24px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .keyword-label { font-size: 12px; color: #6666aa; white-space: nowrap; }
+  .tag {
+    background: rgba(110,66,193,0.15);
+    border: 1px solid rgba(110,66,193,0.4);
+    color: #c4a8ff; font-size: 12px;
+    padding: 3px 12px; border-radius: 20px; font-family: monospace;
+  }
+
+  /* 과제 */
+  .assignment-card {
+    background: linear-gradient(135deg, #0f2027, #1a1a35);
+    border: 1px solid #4a8060; border-radius: 12px;
+    padding: 24px 28px; margin-bottom: 16px;
+  }
+  .assignment-card .section-label { color: #4aaa80; }
+  .assignment-card .section-label::after { background: rgba(74,170,128,0.3); }
+  .assignment-text { font-size: 15px; color: #e8e8f0; line-height: 1.7; margin-bottom: 16px; }
+  .criteria-box {
+    background: rgba(74,170,128,0.08);
+    border: 1px solid rgba(74,170,128,0.3);
+    border-radius: 8px; padding: 14px 18px;
+  }
+  .criteria-title { font-size: 12px; color: #4aaa80; font-weight: 600; margin-bottom: 8px; }
+  .criteria-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    list-style: none;
+  }
+  .criteria-grid li {
+    font-size: 13px; color: #aaccaa;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .criteria-grid li::before { content: '▸'; color: #4aaa80; font-size: 10px; }
+
+  .footer {
+    display: flex; justify-content: space-between;
+    margin-top: 40px; padding: 16px 0;
+    border-top: 1px solid #2a2a45;
+    font-size: 12px; color: #4a4a70;
+  }
+
+  @media print {
+    body { background: #fff; color: #111; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 헤더 -->
+  <div class="header">
+    <div class="header-badge">📚 WEEK 01 · DAY 01</div>
+    <h1>CSP 인터페이스 완전 정복</h1>
+    <p class="header-sub">Clip Studio Paint EX · Galaxy Tab S11 Ultra + S Pen</p>
+    <div class="header-meta">
+      <div class="meta-chip">⏱ 3시간 (평일)</div>
+      <div class="meta-chip">📌 Phase 1 — 환경 최적화</div>
+      <div class="meta-chip">🎮 8BitDo 컨트롤러 연결 확인</div>
+    </div>
+  </div>
+
+  <!-- 목표 -->
+  <div class="goal-card">
+    <div class="section-label">🎯 오늘의 목표</div>
+    <div class="goal-text">
+      CSP의 모든 패널과 도구가 <strong>어디 있고 무슨 역할인지</strong> 파악한다.<br>
+      수업이 끝나면 <strong>모르는 버튼이 없는 상태</strong>가 목표.
+    </div>
+  </div>
+
+  <!-- 이론 1: 인터페이스 -->
+  <div class="card">
+    <div class="section-label">📖 이론 1 — CSP 전체 인터페이스</div>
+
+    <div class="img-block">
+      <div class="img-caption">🖥️ CSP 전체 화면 구성 (공식 Press Assets)</div>
+      <img src="https://www.clipstudio.net/view/img/press-assets/screenshot_pc_en.png"
+           alt="CSP 전체 인터페이스" loading="lazy">
+      <div class="img-source">출처: clipstudio.net/en/gallery/press-assets</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>패널 이름</th><th>위치</th><th>역할</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong style="color:#e8e8ff">도구 팔레트</strong></td><td>왼쪽 세로</td><td>펜/지우개/선택/이동 등 주요 도구</td></tr>
+        <tr><td><strong style="color:#e8e8ff">서브 도구 팔레트</strong></td><td>왼쪽 하단</td><td>선택한 도구의 세부 종류 (G펜, 연필 등)</td></tr>
+        <tr><td><strong style="color:#e8e8ff">도구 속성 패널</strong></td><td>오른쪽 하단</td><td>브러시 크기, 불투명도, 안정화 수치</td></tr>
+        <tr><td><strong style="color:#e8e8ff">레이어 패널</strong></td><td>오른쪽 상단</td><td>레이어 목록, 추가/삭제/순서 변경</td></tr>
+        <tr><td><strong style="color:#e8e8ff">컬러 패널</strong></td><td>오른쪽 중간</td><td>색상 선택</td></tr>
+        <tr><td><strong style="color:#e8e8ff">서브 뷰</strong></td><td>우하단</td><td>참고 이미지 고정해놓는 패널</td></tr>
+      </tbody>
+    </table>
+
+    <div class="info-box">
+      💡 <strong>패널이 안 보이면?</strong> 메뉴바 → <strong>윈도우</strong> → 해당 패널 이름 체크.<br>
+      패널은 드래그해서 원하는 위치에 도킹할 수 있다.
+    </div>
+  </div>
+
+  <!-- 이론 2: 브러시/서브 도구 -->
+  <div class="card">
+    <div class="section-label">📖 이론 2 — 브러시 & 서브 도구 접근</div>
+
+    <div class="img-block">
+      <div class="img-caption">🖌️ 서브 도구 팔레트 열기 (GIF)</div>
+      <img src="https://gvaat.com/wp-content/uploads/2023/02/sub_menu_tool_Clip_Studio_Paint.gif"
+           alt="CSP 서브 도구 접근 방법" loading="lazy">
+      <div class="img-source">출처: gvaat.com — Ultimate Guide to CSP</div>
+    </div>
+
+    <p style="font-size:14px; color:#c0c0d8; line-height:1.7; margin-top:12px;">
+      도구 팔레트에서 아이콘을 클릭하면 <strong style="color:#e8e8ff">서브 도구 팔레트</strong>가 열린다.
+      여기서 G펜, 연필, 밀리펜 등 세부 브러시 종류를 선택한다.
+      오늘은 <strong style="color:#e8e8ff">G펜 / 연필 / 에어브러시</strong> 3가지를 직접 써본다.
+    </p>
+
+    <div class="img-block" style="margin-top:16px;">
+      <div class="img-caption">🎨 컬러 휠 패널 (GIF)</div>
+      <img src="https://gvaat.com/wp-content/uploads/2023/02/color_wheel_Clip_studio_paint.gif"
+           alt="CSP 컬러 휠" loading="lazy">
+      <div class="img-source">출처: gvaat.com — Ultimate Guide to CSP</div>
+    </div>
+  </div>
+
+  <!-- 이론 3: 핵심 단축키 -->
+  <div class="card">
+    <div class="section-label">📖 이론 3 — 핵심 단축키 (매일 수백 번 쓰는 것들)</div>
+
+    <!-- H키 설명 -->
+    <h3 style="margin-bottom:12px;">H키 — 좌우 반전 ★★★ 가장 중요</h3>
+
+    <div class="img-block">
+      <div class="img-caption">🔄 H키 반전 — 네비게이터 + 메뉴 + 단축키 3가지 방법</div>
+      <img src="https://www.pipelinecomics.com/learncsp/wp-content/uploads/sites/9/2016/05/mirror_navigator_labels2.jpeg"
+           alt="CSP 반전 방법 네비게이터" loading="lazy">
+      <div class="img-source">출처: pipelinecomics.com — How to Flip an Image</div>
+    </div>
+
+    <div class="info-box" style="margin-top:8px;">
+      💡 <strong>왜 H키가 중요한가?</strong><br>
+      사람의 눈은 같은 방향으로 계속 보면 뇌가 오류를 보정해버린다.
+      반전하면 오류가 즉시 보인다. 프로 일러스트레이터는 5분에 한 번 이상 H키를 누른다.
+    </div>
+
+    <!-- R키 설명 -->
+    <h3 style="margin-top:24px; margin-bottom:12px;">R키 — 캔버스 회전</h3>
+
+    <div class="img-block">
+      <div class="img-caption">🔃 R키 캔버스 회전 가이드</div>
+      <img src="https://doncorgi.com/wp-content/uploads/2019/02/HowToRotateAndMoveTheCanvasInClipStudioPaint_Cover.jpg"
+           alt="CSP 캔버스 회전" loading="lazy">
+      <div class="img-source">출처: doncorgi.com — How to Rotate the Canvas in CSP</div>
+    </div>
+
+    <p style="font-size:14px; color:#c0c0d8; line-height:1.7; margin-top:12px; margin-bottom:20px;">
+      불편한 방향의 선을 억지로 긋지 마라. 캔버스를 내가 편한 방향으로 돌리면
+      모든 방향의 선이 편해진다. 돌아간 캔버스를 원상복구 할 때는 <span class="key">F</span>키.
+    </p>
+
+    <!-- 전체 단축키 테이블 -->
+    <table>
+      <thead>
+        <tr><th>단축키</th><th>기능</th><th>중요도 & 설명</th></tr>
+      </thead>
+      <tbody>
+        <tr class="star">
+          <td><span class="key">H</span></td>
+          <td>좌우 반전</td>
+          <td class="note">★★★ 선 오류 즉시 발견. 5분에 한 번 이상 필수.</td>
+        </tr>
+        <tr>
+          <td><span class="key">R</span></td>
+          <td>캔버스 회전</td>
+          <td>불편한 각도를 편한 방향으로. 선 품질 즉시 향상.</td>
+        </tr>
+        <tr>
+          <td><span class="key">Space</span></td>
+          <td>캔버스 이동</td>
+          <td>누르는 동안 손바닥 도구로 임시 전환.</td>
+        </tr>
+        <tr>
+          <td><span class="key">[</span> / <span class="key">]</span></td>
+          <td>브러시 크기 ±</td>
+          <td>작업 중 빠르게 브러시 크기 조절.</td>
+        </tr>
+        <tr>
+          <td><span class="key">Ctrl+Z</span></td>
+          <td>실행 취소</td>
+          <td>기본 중의 기본. 겁내지 말고 그려라.</td>
+        </tr>
+        <tr>
+          <td><span class="key">F</span></td>
+          <td>화면 맞추기</td>
+          <td>캔버스를 화면에 꽉 차게. 회전 리셋도 포함.</td>
+        </tr>
+        <tr>
+          <td><span class="key">Ctrl+T</span></td>
+          <td>변형(Transform)</td>
+          <td>그린 것의 크기/위치/기울기 조절.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 실습 순서 -->
+  <div class="card">
+    <div class="section-label">✏️ 실습 순서</div>
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>모든 패널 직접 찾아보기 (30분)</strong>
+          <div class="step-sub">
+            위 표의 패널 6개를 각각 클릭해서 화면에서 실제 위치 확인.<br>
+            패널이 없으면 메뉴바 → 윈도우 → 해당 패널 이름 체크.
+          </div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>새 캔버스 만들고 단축키 7개 연습 (1시간)</strong>
+          <div class="step-sub">
+            파일 → 신규 → A4, 350dpi, RGB 컬러.<br>
+            H / R / Space / [ / ] / F / Ctrl+Z 각 10번씩. <strong>H키를 가장 많이 써볼 것.</strong>
+          </div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>브러시 3종 비교 (30분)</strong>
+          <div class="step-sub">
+            도구 팔레트 → 펜 → 서브 도구에서 <strong>G펜 / 연필 / 에어브러시</strong> 각각 선 5개 그어보기.<br>
+            굵기, 텍스처, 끝 처리 차이 느끼기.
+          </div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <strong>레이어 구조 연습 (1시간)</strong>
+          <div class="step-sub">
+            레이어 3개 만들고 → 각각에 다른 브러시로 선 그리기 → 순서 바꾸기.<br>
+            눈 아이콘(숨기기), 이름 변경, 삭제, 복제 연습.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 참고 키워드 -->
+  <div class="keyword-row">
+    <span class="keyword-label">🖼️ 검색 키워드</span>
+    <div style="display:flex; flex-wrap:wrap; gap:8px;">
+      <span class="tag">CSP interface tutorial</span>
+      <span class="tag">clip studio paint layer basics</span>
+      <span class="tag">클립스튜디오 단축키</span>
+      <span class="tag">CSP Galaxy Tab setup</span>
+    </div>
+  </div>
+
+  <!-- 과제 -->
+  <div class="assignment-card">
+    <div class="section-label">📝 오늘의 과제</div>
+    <div class="assignment-text">
+      CSP에서 레이어 3개를 만들고, 각 레이어에 <strong>G펜 / 연필 / 에어브러시</strong>로 선을 그어서<br>
+      레이어 패널이 보이는 <strong>전체 화면 스크린샷</strong> 제출.<br>
+      <span style="color:#8888aa; font-size:13px;">+ H키로 반전한 화면도 같이 제출.</span>
+    </div>
+    <div class="criteria-box">
+      <div class="criteria-title">✅ 합격 기준</div>
+      <ul class="criteria-grid">
+        <li>레이어 3개 이상 생성됨</li>
+        <li>브러시별 선 차이 보임</li>
+        <li>레이어 이름이 지정됨</li>
+        <li>H키 반전 화면 포함</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>일러스트 강사봇 · 스타레일/명조 스타일 17주 과정</span>
+    <span>1주차 1일차 / 17주</span>
+  </div>
+
+</div>
+</body>
+</html>

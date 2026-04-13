@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3주차 — 두상 구조</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:#0f0f1a;color:#e8e8f0;padding:32px 16px}
+.page{max-width:900px;margin:0 auto}
+.week-header{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border:1px solid #3a3a5c;border-radius:16px;padding:28px 36px;margin-bottom:24px;position:relative;overflow:hidden}
+.week-header::before{content:'';position:absolute;top:-40%;right:-5%;width:280px;height:280px;background:radial-gradient(circle,rgba(110,66,193,.15) 0%,transparent 70%)}
+.week-badge{display:inline-block;background:rgba(110,66,193,.3);border:1px solid #6e42c1;color:#c4a8ff;font-size:11px;font-weight:600;padding:3px 12px;border-radius:20px;letter-spacing:1px;margin-bottom:10px}
+.week-header h1{font-size:26px;font-weight:700;color:#fff;margin-bottom:6px}
+.week-header p{font-size:14px;color:#8888aa}
+.week-meta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px 12px;font-size:12px;color:#aaaacc}
+.day-nav{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.day-btn{background:#1a1a30;border:1px solid #3a3a5c;color:#8888aa;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;transition:.2s}
+.day-btn:hover,.day-btn.active{background:#6e42c1;border-color:#6e42c1;color:#fff}
+.day-section{display:none}.day-section.active{display:block}
+.card{background:#141428;border:1px solid #2a2a45;border-radius:12px;padding:24px;margin-bottom:18px}
+.lbl{font-size:10px;font-weight:700;letter-spacing:2px;color:#6e42c1;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.lbl::after{content:'';flex:1;height:1px;background:rgba(110,66,193,.3)}
+.goal-card{background:linear-gradient(135deg,#1e1e35,#252540);border:1px solid #6e42c1;border-left:4px solid #6e42c1;border-radius:12px;padding:20px 24px;margin-bottom:18px}
+.goal-text{font-size:16px;color:#e8e8ff;line-height:1.7}.goal-text strong{color:#c4a8ff}
+.card p,.card li{font-size:13px;line-height:1.8;color:#c0c0d8}
+.card ul{padding-left:18px;margin-top:6px}
+.img-block{margin:16px 0;border-radius:10px;overflow:hidden;border:1px solid #2a2a45}
+.img-cap{background:#1a1a30;border-bottom:1px solid #2a2a45;padding:7px 14px;font-size:11px;color:#6666aa}
+.img-block img{width:100%;display:block;background:#0d0d1a;max-height:420px;object-fit:contain}
+.img-src{background:#0f0f20;padding:4px 14px;font-size:10px;color:#444466;text-align:right}
+.info{background:rgba(255,200,0,.05);border:1px solid rgba(255,200,0,.2);border-left:3px solid #ffc800;border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13px;color:#ccaa50;line-height:1.6}
+.info strong{color:#ffd844}
+.steps{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.snum{flex-shrink:0;width:26px;height:26px;background:linear-gradient(135deg,#6e42c1,#4a2d8a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-top:1px}
+.scont{flex:1;font-size:13px;color:#c0c0d8;line-height:1.7}.scont strong{color:#e8e8ff}
+.sub{margin-top:6px;padding:8px 12px;background:rgba(110,66,193,.08);border-left:3px solid #6e42c1;border-radius:0 6px 6px 0;font-size:12px;color:#aaaacc;line-height:1.6}
+.kwrow{background:#141428;border:1px solid #2a2a45;border-radius:10px;padding:14px 20px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.kwlbl{font-size:11px;color:#6666aa;white-space:nowrap}
+.tag{background:rgba(110,66,193,.15);border:1px solid rgba(110,66,193,.4);color:#c4a8ff;font-size:11px;padding:3px 10px;border-radius:16px;font-family:monospace}
+.assign{background:linear-gradient(135deg,#0f2027,#1a1a35);border:1px solid #4a8060;border-radius:12px;padding:20px 24px;margin-bottom:18px}
+.assign .lbl{color:#4aaa80}.assign .lbl::after{background:rgba(74,170,128,.3)}
+.atext{font-size:14px;color:#e8e8f0;line-height:1.7;margin-bottom:12px}
+.cbox{background:rgba(74,170,128,.08);border:1px solid rgba(74,170,128,.3);border-radius:8px;padding:12px 16px}
+.ctitle{font-size:11px;color:#4aaa80;font-weight:600;margin-bottom:8px}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;list-style:none}
+.cgrid li{font-size:12px;color:#aaccaa;display:flex;align-items:center;gap:5px}
+.cgrid li::before{content:'▸';color:#4aaa80;font-size:9px}
+.footer{display:flex;justify-content:space-between;margin-top:32px;padding:14px 0;border-top:1px solid #2a2a45;font-size:11px;color:#4a4a70}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="week-header">
+  <div class="week-badge">WEEK 03</div>
+  <h1>두상 구조</h1>
+  <p>어떤 각도에서도 두상을 정확하게 잡는 능력 습득</p>
+  <div class="week-meta">
+    <div class="chip">📌 Phase 2</div>
+    <div class="chip">⏱ 평일 3h / 주말 4h</div>
+    <div class="chip">🎯 Loomis 방식 애니 적용</div>
+  </div>
+</div>
+
+<div class="day-nav">
+  <button class="day-btn active" onclick="showDay(1)">1일차</button>
+  <button class="day-btn" onclick="showDay(2)">2일차</button>
+  <button class="day-btn" onclick="showDay(3)">3일차</button>
+  <button class="day-btn" onclick="showDay(4)">4일차</button>
+  <button class="day-btn" onclick="showDay(5)">5일차</button>
+  <button class="day-btn" onclick="showDay(6)">6일차 🌙</button>
+  <button class="day-btn" onclick="showDay(7)">7일차 🌙</button>
+</div>
+
+<!-- DAY 1 -->
+<div class="day-section active" id="day1">
+<div class="goal-card"><div class="lbl">🎯 1일차 목표</div>
+<div class="goal-text">두상의 <strong>3차원 구조</strong> 이해 — 정면 두상 완성.</div></div>
+<div class="card"><div class="lbl">📖 두상 구조 — Loomis 방식</div>
+<div class="img-block">
+  <div class="img-cap">💀 Loomis 두상 구조 단계별 설명 (GIF)</div>
+  <img src="https://www.gvaat.com/wp-content/uploads/2020/12/Loomis-Head-Construction-_-Step-by-step-with-examples.gif" alt="Loomis 두상 구조" loading="lazy">
+  <div class="img-src">출처: gvaat.com</div>
+</div>
+<div class="img-block">
+  <div class="img-cap">📐 Loomis 두상 예시</div>
+  <img src="https://www.gvaat.com/wp-content/uploads/2020/12/Loomis-head-example-1.jpg" alt="Loomis 두상 예시" loading="lazy">
+  <div class="img-src">출처: gvaat.com</div>
+</div>
+<p>Loomis 방식 (애니 적용):</p>
+<ul style="margin:10px 0 0 18px">
+  <li>① 원 하나 그리기</li>
+  <li>② 원 아래 1/3을 살짝 잘라서 턱 위치 잡기</li>
+  <li>③ 턱을 좁고 뾰족하게 연결 (애니 스타일)</li>
+  <li>④ 눈은 원의 중간선보다 약간 아래</li>
+  <li>⑤ 코는 눈과 턱의 중간 / 입은 코~턱의 1/3</li>
+</ul>
+<div class="info">💡 <strong>애니 스타일 특징:</strong> 실제 인체보다 눈이 크고, 코·입이 작음. 턱이 뾰족함. 두개부가 안면부보다 크다.</div>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>가이드 없이 얼굴 3개 (30분)</strong><div class="sub">현재 실력 파악용. 정답 없음.</div></div></div>
+  <div class="step"><div class="snum">2</div><div class="scont"><strong>Loomis 비율 가이드로 정면 얼굴 5개 (1시간 30분)</strong><div class="sub">가이드라인 레이어 따로 두고 위에 선화.</div></div></div>
+  <div class="step"><div class="snum">3</div><div class="scont"><strong>가이드 보이는 vs 숨긴 버전 비교 (1시간)</strong><div class="sub">스타레일 캐릭터 얼굴 옆에 비율 가이드 그려서 비교.</div></div></div>
+</div></div>
+<div class="kwrow"><span class="kwlbl">🖼️ 키워드</span><span class="tag">anime head structure loomis</span><span class="tag">애니 얼굴 비율 가이드</span></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">비율 가이드 표시한 정면 얼굴 2개 + 가이드 숨긴 최종 얼굴 1개 제출.</div></div>
+</div>
+
+<!-- DAY 2 -->
+<div class="day-section" id="day2">
+<div class="goal-card"><div class="lbl">🎯 2일차 목표</div>
+<div class="goal-text"><strong>측면(옆모습)</strong> 두상 완성.</div></div>
+<div class="card"><div class="lbl">📖 측면 두상 핵심</div>
+<p>많이 틀리는 부분:</p>
+<ul style="margin:10px 0 12px 18px">
+  <li>귀 위치가 너무 앞에 → 실제로는 두상 한가운데</li>
+  <li>코가 너무 작음</li>
+  <li>뒷통수가 너무 납작 → 실제로는 더 둥글고 큼</li>
+</ul>
+<p>애니 측면 특징: 코가 뾰족하게 강조, 입술이 살짝 앞으로, 턱 라인이 깔끔한 곡선.</p>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>측면 원 + 위치 잡기 (1시간)</strong><div class="sub">귀 위치: 원의 세로 중간, 가로 3/4 지점.</div></div></div>
+  <div class="step"><div class="snum">2</div><div class="scont"><strong>측면 얼굴 5개 (2시간)</strong></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">측면 얼굴 3개 제출 (귀 위치 표시 포함).</div></div>
+</div>
+
+<!-- DAY 3 -->
+<div class="day-section" id="day3">
+<div class="goal-card"><div class="lbl">🎯 3일차 목표</div>
+<div class="goal-text"><strong>3/4면</strong>(약 45도 돌아간) 두상 완성 — 일러스트에서 가장 많이 쓰는 각도.</div></div>
+<div class="card"><div class="lbl">📖 3/4면 두상</div>
+<p>핵심 포인트:</p>
+<ul style="margin:10px 0 0 18px">
+  <li>정면 → 측면으로 돌면 얼굴 세로 중심선이 곡선으로 바뀜</li>
+  <li>보이지 않는 쪽 눈이 좁아짐 (원근)</li>
+  <li>코의 그림자(노스텐)이 보임</li>
+  <li>보이지 않는 쪽 뺨이 좁아짐</li>
+</ul>
+<div class="info">💡 <strong>스타레일/명조 포트레이트의 90%가 3/4면 각도다.</strong> 이 각도를 마스터하는 것이 핵심.</div>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>3/4면 얼굴 5개 (3시간)</strong><div class="sub">왼쪽 2개 / 오른쪽 2개 / 약간 올려본 1개.</div></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">3/4면 얼굴 (좌향) 2개 + (우향) 2개 제출.</div></div>
+</div>
+
+<!-- DAY 4 -->
+<div class="day-section" id="day4">
+<div class="goal-card"><div class="lbl">🎯 4일차 목표</div>
+<div class="goal-text">올려보기(앙각)와 내려보기(부감) <strong>각도 표현</strong>.</div></div>
+<div class="card"><div class="lbl">📖 앙각 / 부감</div>
+<p>앙각(Low Angle): 아래서 위 봄 → 턱 작고 이마 넓음 → 강인·위압적</p>
+<p style="margin-top:8px">부감(High Angle): 위서 아래 봄 → 이마 크고 턱 작음 → 귀엽고 연약</p>
+<div class="info">💡 <strong>핵심:</strong> 눈/코/입의 수평선이 평평한 게 아니라 곡선(아치형)으로 변한다.</div>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>앙각 3개 + 부감 3개 (3시간)</strong><div class="sub">수평선 가이드를 곡선으로 바꾸는 연습부터 시작.</div></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">앙각 1개 + 부감 1개 두상 제출.</div></div>
+</div>
+
+<!-- DAY 5 -->
+<div class="day-section" id="day5">
+<div class="goal-card"><div class="lbl">🎯 5일차 목표</div>
+<div class="goal-text">같은 캐릭터를 <strong>4방향 턴어라운드</strong>로 그리기.</div></div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>4방향 턴어라운드 (3시간)</strong><div class="sub">정면 → 3/4면 → 측면 → 뒷면. 같은 비율 유지.</div></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">오리지널 캐릭터 두상 4방향 턴어라운드 제출.</div>
+<div class="cbox"><div class="ctitle">✅ 합격 기준</div>
+<ul class="cgrid"><li>4방향 모두 있음</li><li>비율 일관성</li><li>각도별 특징 표현됨</li><li>H키 반전 확인</li></ul></div></div>
+</div>
+
+<!-- DAY 6 -->
+<div class="day-section" id="day6">
+<div class="goal-card"><div class="lbl">🎯 6일차 목표 (주말)</div>
+<div class="goal-text">두상 위에 <strong>자연스러운 머리카락 형태</strong> 완성.</div></div>
+<div class="card"><div class="lbl">📖 헤어라인과 머리카락 볼륨</div>
+<p>머리카락은 두상에서 약간 떠 있다. 두상 원보다 10~15% 크게 그린다.</p>
+<p style="margin-top:8px">스타레일 캐릭터는 대부분 헤어라인이 낮고 앞머리가 두꺼움.</p>
+</div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>앞머리 형태 3종 연습 (2시간)</strong><div class="sub">직선형 / 사이드파트 / 중분형.</div></div></div>
+  <div class="step"><div class="snum">2</div><div class="scont"><strong>스타레일 캐릭터 머리카락 분석 + 따라 그리기 (2시간)</strong></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">두상 + 헤어스타일 3종 (앞머리 다르게) 제출.</div></div>
+</div>
+
+<!-- DAY 7 -->
+<div class="day-section" id="day7">
+<div class="goal-card"><div class="lbl">🎯 7일차 목표 (주말)</div>
+<div class="goal-text">이번 주 두상 기술 <strong>자유 적용</strong>.</div></div>
+<div class="card"><div class="lbl">✏️ 실습 순서</div>
+<div class="steps">
+  <div class="step"><div class="snum">1</div><div class="scont"><strong>좋아하는 스타레일/명조 캐릭터 두상 3개 (4시간)</strong><div class="sub">각각 다른 각도로. 정확도보다 각도 도전이 중요.</div></div></div>
+</div></div>
+<div class="assign"><div class="lbl">📝 과제</div>
+<div class="atext">스타레일/명조 캐릭터 두상 3개 (각각 다른 각도) 제출.</div></div>
+</div>
+
+<div class="footer"><span>일러스트 강사봇 · 스타레일/명조 스타일 17주 과정</span><span>3주차 / 17주</span></div>
+</div>
+<script>
+function showDay(n){
+  document.querySelectorAll('.day-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('day'+n).classList.add('active');
+  document.querySelectorAll('.day-btn')[n-1].classList.add('active');
+}
+</script>
+</body>
+</html>
