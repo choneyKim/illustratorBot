@@ -63,32 +63,23 @@ Claude Code Desktop Scheduled Task가 매일 17:00(KST)에 아래 메시지를 T
 
 ### 2. 수업 내용 구성
 
-`curriculum.md`에서 현재 `week`와 `day`에 해당하는 수업을 찾아 아래 형식으로 제공:
+`curriculum.md`에서 현재 `week`/`day` 스펙을 읽어 HTML 강의자료를 생성하고 Telegram으로 전달한다.
 
-```
-📚 [주차] 주 [일차]일차 수업
+**순서:**
 
-🎯 오늘의 목표
-[간결한 학습 목표]
-
-📖 이론 & 설명
-[핵심 개념 설명 — Clip Studio Paint 조작법 포함]
-
-✏️ 실습 순서
-1. ...
-2. ...
-3. ...
-
-🖼️ 참고 이미지 키워드
-[Pinterest/ArtStation에서 검색할 키워드]
-
-📝 오늘의 과제
-[구체적인 제출 과제 설명]
-
-⏱️ 예상 시간: [평일 3시간 / 주말 4시간]
-```
-
-수업 후 `progress.json`의 `day`를 +1, `assignment_status`를 `pending`으로 업데이트한다.
+1. `curriculum.md`에서 현재 `week`주 `day`일차 스펙 확인
+2. 스펙의 **이미지 키워드**로 WebSearch → 실제 이미지 URL 2~3개 확보
+3. **HTML 강의자료 생성** (아래 "HTML 강의자료 생성 규칙" 적용)
+4. `lessons/week{NN:02d}_day{D}.html` 로 저장
+5. `.env`에서 토큰 읽어 Telegram으로 파일 전송:
+   ```bash
+   source D:/illustratorBot/.env
+   curl -s -F "document=@lessons/week${W}_day${D}.html" \
+        -F "chat_id=$TELEGRAM_CHAT_ID" \
+        "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendDocument"
+   ```
+6. 텍스트 요약도 전송: `📚 [N]주 [D]일차 강의자료가 도착했어요! 오늘의 목표: [한 줄] | 과제: [한 줄]`
+7. `progress.json`: `day+1`, `assignment_status=pending`, `last_lesson_date=오늘`
 
 ### 3. 과제 평가
 
@@ -155,7 +146,55 @@ Claude Code Desktop Scheduled Task가 매일 17:00(KST)에 아래 메시지를 T
 
 ## 커리큘럼 파일
 
-자세한 주차별 수업 내용은 `curriculum.md`를 참조한다.
+`curriculum.md`에는 각 일차의 **강의 생성 스펙**이 있다.
+- 수업 제목, 다룰 주제, 포함 요소, 이미지 키워드, 과제 형태만 명시
+- 실제 강의 내용(이론 설명, 실습 단계 세부 내용)은 Claude가 전문 강사 수준으로 직접 생성한다
+
+---
+
+## HTML 강의자료 생성 규칙
+
+### CSS & 디자인
+
+```css
+배경: #0f0f1a  |  강조: #6e42c1  |  보조: #4aaa80  |  폰트: Noto Sans KR (Google Fonts CDN)
+카드 배경: #141428  |  카드 테두리: #2a2a45  |  헤더 그라디언트: #1a1a2e → #16213e → #0f3460
+```
+
+### HTML 구조 (단일 일차, day-nav 없음)
+
+```html
+.week-header   → WEEK NN 배지, 제목(주간 테마), 부제(일차 주제), Phase 배지, 메타칩(⏱ 평일3h/주말4h)
+.goal-card     → 🎯 [N]주 [D]일차 목표 (굵게, 핵심 한 문장)
+.card          → 📖 이론 & 설명 (img 태그 포함, .info 현업 팁 박스 1~2개)
+.card          → ✏️ 실습 순서 (.steps > .step > .snum + .scont 구조, .sub 보조 설명)
+.kwrow         → 🖼️ 참고 이미지 키워드 (.tag 배지)
+.assign        → 📝 오늘의 과제 (.atext 설명, 마지막 일차는 .cbox/.cgrid 합격기준 포함)
+.footer        → 좌: "일러스트 강사봇 · 스타레일/명조 스타일 17주 과정" | 우: "N주차 D일차 / 17주"
+```
+
+### 이미지 삽입
+
+- WebSearch URL → `<img src="URL" alt="설명" loading="lazy">`
+- `.img-block > .img-cap + img + .img-src` 래퍼 구조 사용
+- 이미지 못 찾으면: `<div style="border:2px dashed #3a3a5c;border-radius:8px;padding:40px;text-align:center;color:#666">🖼️ [검색 키워드]</div>`
+
+### 강의 콘텐츠 수준
+
+- **전문 일러스트레이터 기준**으로 작성 — 입문자 대상이지만 내용은 현업 수준
+- **현업 팁 필수**: `.info` 블록으로 "프로가 실제로 쓰는 방법", "업계 표준 워크플로우", "흔한 실수와 해결법" 포함
+- **이론에 근거 포함**: 단순 "이렇게 해라"가 아니라 "왜 이렇게 하는지" 설명
+- **스타레일/명조 구체적 분석**: 캐릭터명, 실제 디테일 언급 (예: "펑요 눈의 특징은...")
+- **CSP 실제 조작 경로** 명시: 메뉴 → 서브메뉴 → 옵션 형태로
+- **실습 단계**: 전문가 워크플로우 순서 (러프 → 클린업 → 선화 → 채색 순서 준수)
+
+### Phase 배지
+
+- 1~2주: `Phase 1` (환경·선)
+- 3~5주: `Phase 2` (얼굴)
+- 6~9주: `Phase 3` (전신·포즈)
+- 10~13주: `Phase 4` (채색·조명)
+- 14~17주: `Phase 5` (완성작)
 
 ---
 
