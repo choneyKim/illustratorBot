@@ -121,14 +121,29 @@ Claude Desktop 앱 → 사이드바 **Schedule** → **New task** → **New loca
 
 **Prompt:**
 ```
-D:/illustratorBot/.env 파일에서 TELEGRAM_BOT_TOKEN과 TELEGRAM_CHAT_ID를 읽어라.
-D:/illustratorBot/progress.json을 읽어서 현재 week와 day를 확인하라.
-D:/illustratorBot/curriculum.md에서 현재 week의 day+1 일차 제목과 오늘의 목표 첫 줄을 읽어라.
-아래 형식으로 Telegram Bot API에 Node.js 또는 curl로 메시지를 전송하라:
+D:/illustratorBot/progress.json을 읽어서 현재 week(W)와 day(D)를 확인하라.
+
+다음 수업 계산:
+- D < 7이면 → 다음 수업 = W주 (D+1)일차
+- D = 7이면 → 다음 수업 = (W+1)주 1일차
+
+강의자료 사전 생성 (핵심):
+1. lessons/week{W:02d}_day{D+1}.html 파일이 있는지 확인
+2. 없으면:
+   - D:/illustratorBot/curriculum.md에서 해당 일차 스펙 읽기
+   - 스펙의 이미지 키워드로 WebSearch → 실제 이미지 URL 2~3개 확보
+   - CLAUDE.md의 HTML 강의자료 생성 규칙에 따라 HTML 생성
+   - lessons/week{W:02d}_day{D+1}.html 로 저장
+3. 있으면 → 건너뜀
+
+알림 전송:
+D:/illustratorBot/.env에서 TELEGRAM_BOT_TOKEN과 TELEGRAM_CHAT_ID를 읽어라.
+D:/illustratorBot/curriculum.md에서 해당 일차의 오늘의 목표 첫 줄을 읽어라.
+아래 형식으로 curl로 Telegram 메시지를 전송하라:
 
 "📚 일러스트 학습시간입니다!
 
-오늘: [week]주 [day+1]일차 — [오늘의 목표 첫 줄]
+오늘: [W]주 [D+1]일차 — [오늘의 목표 첫 줄]
 
 클로드에게 '시작' 이라고 보내면 수업을 시작합니다."
 ```

@@ -1,9 +1,9 @@
 {
   "week": 1,
-  "day": 0,
-  "assignment_status": "none",
+  "day": 1,
+  "assignment_status": "pending",
   "retry_count": 0,
-  "total_days_studied": 0,
-  "last_lesson_date": null,
+  "total_days_studied": 1,
+  "last_lesson_date": "2026-04-13",
   "notes": ""
 }

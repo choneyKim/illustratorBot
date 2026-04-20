@@ -39,7 +39,15 @@
       "Bash(curl -L -I \"https://www.clipstudio.net/wp-content/uploads/2020/09/0138_000_en-us.jpg\")",
       "Bash(curl -L -I \"https://www.gvaat.com/wp-content/uploads/2020/12/Loomis-head-example-1.jpg\")",
       "WebFetch(domain:www.pinterest.com)",
-      "Bash(wc -l D:/illustratorBot/lessons/*.html)"
+      "Bash(wc -l D:/illustratorBot/lessons/*.html)",
+      "Bash(curl -s -F document=@D:/illustratorBot/lessons/week01_day1.html -F chat_id=8777888087 https://api.telegram.org/bot8258836223:AAF_KhrXmH-8u11UQekAeHgrnZhXCPEg6Ms/sendDocument)",
+      "Bash(python -m json.tool)",
+      "Bash(find /d/illustratorBot -type f -name \"*.py\" -exec grep -l \"port\\\\|server\\\\|app\\\\|listen\\\\|Flask\\\\|FastAPI\\\\|Uvicorn\" {} \\\\;)",
+      "Bash(xargs wc:*)",
+      "Bash(find /d/illustratorBot -maxdepth 2 -type f -name \"*.py\" -exec echo \"=== {} ===\" \\\\; -exec head -20 {} \\\\;)",
+      "Bash(ls -la /d/illustratorBot/*.py)",
+      "Bash(bun install:*)",
+      "Bash(curl:*)"
     ]
   }
 }

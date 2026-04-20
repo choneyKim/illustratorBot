@@ -41,13 +41,16 @@ Galaxy Tab S11 Ultra + S Pen + Clip Studio Paint 환경에서 학습한다.
 
 ---
 
-## 매일 오전 5시 알림 트리거
+## 매일 오후 5시 알림 트리거
 
-Claude Code Desktop Scheduled Task가 매일 17:00(KST)에 아래 메시지를 Telegram으로 전송한다:
+Claude Desktop Scheduled Task가 매일 17:00(KST)에 두 가지를 순서대로 실행한다:
 
-> **일러스트 학습시간입니다.**
+1. **강의자료 사전 생성** — 다음 수업 HTML 파일이 없으면 미리 생성해 저장
+2. **Telegram 알림 전송** — "일러스트 학습시간입니다!" + 오늘 목표 한 줄
 
-학생이 해당 알림에 반응하거나 직접 대화를 시작하면 **오늘의 수업**을 제공한다.
+이렇게 하면 학생이 "시작"을 보냈을 때 HTML이 이미 준비되어 **즉시 전달**된다.
+
+학생이 알림에 반응하거나 직접 대화를 시작하면 **오늘의 수업**을 제공한다.
 
 ---
 
@@ -68,9 +71,11 @@ Claude Code Desktop Scheduled Task가 매일 17:00(KST)에 아래 메시지를 T
 **순서:**
 
 1. `curriculum.md`에서 현재 `week`주 `day`일차 스펙 확인
-2. 스펙의 **이미지 키워드**로 WebSearch → 실제 이미지 URL 2~3개 확보
-3. **HTML 강의자료 생성** (아래 "HTML 강의자료 생성 규칙" 적용)
-4. `lessons/week{NN:02d}_day{D}.html` 로 저장
+2. `lessons/week{NN:02d}_day{D}.html` 파일 존재 여부 확인
+   - **파일이 이미 있으면** → 3~4단계 건너뛰고 바로 5단계(전송)로 이동
+   - **파일이 없으면** → 3~4단계 진행
+3. 스펙의 **이미지 키워드**로 WebSearch → 실제 이미지 URL 2~4개 확보
+4. **HTML 강의자료 생성** (아래 "HTML 강의자료 생성 규칙" 적용) → 저장
 5. `.env`에서 토큰 읽어 Telegram으로 파일 전송:
    ```bash
    source D:/illustratorBot/.env
@@ -175,9 +180,22 @@ Claude Code Desktop Scheduled Task가 매일 17:00(KST)에 아래 메시지를 T
 
 ### 이미지 삽입
 
-- WebSearch URL → `<img src="URL" alt="설명" loading="lazy">`
+- WebSearch URL → `<img src="URL" alt="설명" loading="lazy" referrerpolicy="no-referrer" crossorigin="anonymous">`
 - `.img-block > .img-cap + img + .img-src` 래퍼 구조 사용
-- 이미지 못 찾으면: `<div style="border:2px dashed #3a3a5c;border-radius:8px;padding:40px;text-align:center;color:#666">🖼️ [검색 키워드]</div>`
+- **모든 이미지는 반드시 출처 링크 포함** — iPhone 등 모바일에서 이미지 로드 실패 시 링크로 원문 접근 가능하도록
+- `.img-block` 구조:
+  ```html
+  <div class="img-block">
+    <div class="img-cap">📌 이미지 설명</div>
+    <img src="URL" alt="설명" loading="lazy" referrerpolicy="no-referrer">
+    <div class="img-src">
+      출처: 사이트명 &nbsp;·&nbsp;
+      <a href="원문URL" target="_blank" style="color:#8866cc;text-decoration:none">🔗 원문 보기 →</a>
+    </div>
+  </div>
+  ```
+- clipstudio.net 이미지 허용 (튜토리얼 자료 풍부) — 단, 반드시 원문 링크 함께 포함
+- 이미지 못 찾으면: `<div style="border:2px dashed #3a3a5c;border-radius:8px;padding:40px;text-align:center;color:#5a5a7a;font-size:13px">🖼️ [검색 키워드]</div>`
 
 ### 강의 콘텐츠 수준
 

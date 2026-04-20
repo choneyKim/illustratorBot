@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1주차 1일차 — CSP 브러시 세팅</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR',sans-serif;background:#0f0f1a;color:#e8e8f0;padding:32px 16px}
+.page{max-width:900px;margin:0 auto}
+.week-header{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border:1px solid #3a3a5c;border-radius:16px;padding:28px 36px;margin-bottom:24px;position:relative;overflow:hidden}
+.week-header::before{content:'';position:absolute;top:-40%;right:-5%;width:280px;height:280px;background:radial-gradient(circle,rgba(110,66,193,.15) 0%,transparent 70%)}
+.week-badge{display:inline-block;background:rgba(110,66,193,.3);border:1px solid #6e42c1;color:#c4a8ff;font-size:11px;font-weight:600;padding:3px 12px;border-radius:20px;letter-spacing:1px;margin-bottom:10px}
+.week-header h1{font-size:26px;font-weight:700;color:#fff;margin-bottom:6px}
+.week-header p{font-size:14px;color:#8888aa}
+.week-meta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px 12px;font-size:12px;color:#aaaacc}
+.card{background:#141428;border:1px solid #2a2a45;border-radius:12px;padding:24px;margin-bottom:18px}
+.lbl{font-size:10px;font-weight:700;letter-spacing:2px;color:#6e42c1;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.lbl::after{content:'';flex:1;height:1px;background:rgba(110,66,193,.3)}
+.goal-card{background:linear-gradient(135deg,#1e1e35,#252540);border:1px solid #6e42c1;border-left:4px solid #6e42c1;border-radius:12px;padding:20px 24px;margin-bottom:18px}
+.goal-text{font-size:16px;color:#e8e8ff;line-height:1.7}.goal-text strong{color:#c4a8ff}
+.card p,.card li{font-size:13px;line-height:1.8;color:#c0c0d8}
+.card ul{padding-left:18px;margin-top:6px}
+.img-block{margin:16px 0;border-radius:10px;overflow:hidden;border:1px solid #2a2a45}
+.img-cap{background:#1a1a30;border-bottom:1px solid #2a2a45;padding:7px 14px;font-size:11px;color:#6666aa}
+.img-block img{width:100%;display:block;background:#0d0d1a;max-height:420px;object-fit:contain}
+.img-src{background:#0f0f20;padding:4px 14px;font-size:10px;color:#444466;text-align:right}
+.info{background:rgba(255,200,0,.05);border:1px solid rgba(255,200,0,.2);border-left:3px solid #ffc800;border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13px;color:#ccaa50;line-height:1.6}
+.info strong{color:#ffd844}
+.steps{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.snum{flex-shrink:0;width:26px;height:26px;background:linear-gradient(135deg,#6e42c1,#4a2d8a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-top:1px}
+.scont{flex:1;font-size:13px;color:#c0c0d8;line-height:1.7}.scont strong{color:#e8e8ff}
+.sub{margin-top:6px;padding:8px 12px;background:rgba(110,66,193,.08);border-left:3px solid #6e42c1;border-radius:0 6px 6px 0;font-size:12px;color:#aaaacc;line-height:1.6}
+.kwrow{background:#141428;border:1px solid #2a2a45;border-radius:10px;padding:14px 20px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.kwlbl{font-size:11px;color:#6666aa;white-space:nowrap}
+.tag{background:rgba(110,66,193,.15);border:1px solid rgba(110,66,193,.4);color:#c4a8ff;font-size:11px;padding:3px 10px;border-radius:16px;font-family:monospace}
+.assign{background:linear-gradient(135deg,#0f2027,#1a1a35);border:1px solid #4a8060;border-radius:12px;padding:20px 24px;margin-bottom:18px}
+.assign .lbl{color:#4aaa80}.assign .lbl::after{background:rgba(74,170,128,.3)}
+.atext{font-size:14px;color:#e8e8f0;line-height:1.7;margin-bottom:12px}
+.footer{display:flex;justify-content:space-between;margin-top:32px;padding:14px 0;border-top:1px solid #2a2a45;font-size:11px;color:#4a4a70}
+/* Brush comparison table */
+.brush-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:12px}
+.brush-table th{background:rgba(110,66,193,.2);color:#c4a8ff;padding:8px 12px;text-align:left;font-weight:600;border-bottom:1px solid #3a3a5c}
+.brush-table td{padding:8px 12px;border-bottom:1px solid #1e1e38;color:#c0c0d8;vertical-align:top}
+.brush-table tr:last-child td{border-bottom:none}
+.brush-table tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+/* Path indicator */
+.path{display:inline-flex;align-items:center;gap:4px;background:rgba(110,66,193,.1);border:1px solid rgba(110,66,193,.3);border-radius:6px;padding:4px 10px;font-size:11px;color:#c4a8ff;font-family:monospace;margin:4px 0}
+.path-arrow{color:#6e42c1;font-size:10px}
+/* Pressure diagram */
+.pressure-viz{display:flex;gap:16px;margin:14px 0;flex-wrap:wrap}
+.pv-item{flex:1;min-width:120px;background:rgba(110,66,193,.06);border:1px solid #2a2a45;border-radius:8px;padding:12px;text-align:center}
+.pv-label{font-size:10px;color:#6666aa;margin-bottom:6px}
+.pv-line{height:3px;border-radius:2px;margin:4px auto}
+.pv-thin{background:linear-gradient(to right,#6e42c1 0%,#6e42c1 100%);width:60%;height:1px}
+.pv-med{background:linear-gradient(to right,#8855d4 0%,#8855d4 100%);width:75%;height:2.5px}
+.pv-thick{background:linear-gradient(to right,#c4a8ff 0%,#c4a8ff 100%);width:90%;height:5px}
+.pv-val{font-size:10px;color:#8888aa;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<div class="week-header">
+  <div class="week-badge">WEEK 01</div>
+  <h1>CSP 환경 최적화</h1>
+  <p>브러시 세팅 — 선화와 채색의 기반</p>
+  <div class="week-meta">
+    <div class="chip">📌 Phase 1</div>
+    <div class="chip">⏱ 평일 3h</div>
+    <div class="chip">🖌️ 브러시가 선의 품질을 결정한다</div>
+  </div>
+</div>
+
+<!-- GOAL -->
+<div class="goal-card">
+  <div class="lbl">🎯 1주 1일차 목표</div>
+  <div class="goal-text">
+    <strong>3종 브러시 세팅 완료</strong> — G펜 선화 브러시(필압 조정 포함)와 채색 브러시 2종을 직접 설정하고, 테스트 드로잉으로 각 브러시의 반응을 체득한다.
+  </div>
+</div>
+
+<!-- THEORY CARD -->
+<div class="card">
+  <div class="lbl">📖 이론 — 브러시의 원리와 G펜을 쓰는 이유</div>
+
+  <p style="margin-bottom:12px"><strong style="color:#e8e8ff">왜 브러시 설정부터 시작하는가?</strong></p>
+  <p>스타레일·명조 스타일 일러스트의 선화는 <strong style="color:#e8e8ff">굵기 변화가 선의 생명</strong>이다. 손목 힘의 강약이 선의 두께로 그대로 전달될 때, 선 하나에도 캐릭터의 무게감·방향감이 담긴다. 잘못된 브러시 설정은 아무리 많이 연습해도 "기계적인 선"을 만든다. 오늘 올바르게 설정해두면 이후 16주가 전부 달라진다.</p>
+
+  <div class="info">
+    <strong>프로 현업 팁:</strong> 프리랜서 애니 일러스트레이터들이 새 작업을 시작할 때 가장 먼저 하는 일이 브러시 프리셋 확인이다. 브러시는 화가의 붓과 같다 — 처음 한 번 제대로 설정하면 수년간 같은 브러시를 쓴다.
+  </div>
+
+  <!-- Image 1 - Real CSP brush settings screenshot -->
+  <div class="img-block">
+    <div class="img-cap">🖌️ Clip Studio Paint — 애니 스타일별 펜·브러시 설정 비교</div>
+    <img src="https://www.clipstudio.net/wp-content/uploads/2019/08/0002_004_en-us.jpg" alt="CSP 브러시 설정 패널" loading="lazy" referrerpolicy="no-referrer">
+    <div class="img-src">출처: clipstudio.net &nbsp;·&nbsp; <a href="https://www.clipstudio.net/how-to-draw/archives/154262" target="_blank" style="color:#8866cc;text-decoration:none">🔗 원문 보기 →</a></div>
+  </div>
+
+  <p style="margin-top:16px;margin-bottom:8px"><strong style="color:#e8e8ff">G펜(G-pen)이란 무엇인가?</strong></p>
+  <p>G펜은 원래 일본 만화가들이 사용하던 금속 딥 펜(dip pen) 촉의 이름이다. CSP의 G펜 브러시는 이 물리적 특성을 디지털로 재현한다:</p>
+  <ul style="margin:10px 0 10px 18px">
+    <li><strong style="color:#e8e8ff">필압이 낮을 때</strong>: 날카롭고 가는 선 → 머리카락 끝, 눈꺼풀 아래쪽 디테일</li>
+    <li><strong style="color:#e8e8ff">필압이 높을 때</strong>: 두껍고 강한 선 → 윤곽선, 눈꺼풀 위쪽, 옷 접힘</li>
+    <li><strong style="color:#e8e8ff">불투명도 100% 고정</strong>: 선이 항상 깔끔하게 끊긴다 (수채 계열 브러시처럼 번지지 않음)</li>
+  </ul>
+
+  <div class="pressure-viz">
+    <div class="pv-item"><div class="pv-label">약한 필압</div><div class="pv-line pv-thin" style="margin:8px auto"></div><div class="pv-val">1~3px</div></div>
+    <div class="pv-item"><div class="pv-label">중간 필압</div><div class="pv-line pv-med" style="margin:8px auto"></div><div class="pv-val">5~8px</div></div>
+    <div class="pv-item"><div class="pv-label">강한 필압</div><div class="pv-line pv-thick" style="margin:8px auto"></div><div class="pv-val">12~15px</div></div>
+  </div>
+
+  <div class="info">
+    <strong>초보자가 자주 하는 실수:</strong> 처음에 브러시 크기를 너무 크게 설정(20px 이상)한다. 스타레일/명조 스타일의 정교한 선화는 <strong>최대 15px</strong> 안에서 필압으로 굵기를 조절하는 방식이 정석이다. 크기가 너무 크면 필압 차이가 선에 표현되지 않는다.
+  </div>
+
+  <p style="margin-top:16px;margin-bottom:8px"><strong style="color:#e8e8ff">필압 곡선(Pressure Curve)의 원리</strong></p>
+  <p>필압 곡선은 "S펜에 가하는 실제 힘"과 "화면에 나타나는 선 굵기" 사이의 관계를 정의하는 그래프다. 곡선이 왼쪽 위로 볼록하면 조금만 눌러도 굵어지고, 오른쪽 아래로 볼록하면 세게 눌러야 굵어진다.</p>
+
+  <p style="margin-top:8px">갤럭시 탭 S11 Ultra + S Pen 환경에서 권장하는 설정:</p>
+  <ul style="margin:8px 0 8px 18px">
+    <li>전체 필압 조정 경로: <span class="path">파일 <span class="path-arrow">▶</span> 환경설정 <span class="path-arrow">▶</span> 태블릿 <span class="path-arrow">▶</span> 필압 조정</span></li>
+    <li>브러시별 필압 조정 경로: <span class="path">서브 도구 팔레트 <span class="path-arrow">▶</span> 브러시 더블클릭 <span class="path-arrow">▶</span> 서브 도구 상세 <span class="path-arrow">▶</span> 브러시 크기 <span class="path-arrow">▶</span> 필압 아이콘</span></li>
+  </ul>
+
+  <div class="info">
+    <strong>S Pen 전용 팁:</strong> 갤럭시 탭의 S Pen은 4096레벨 필압을 지원하지만, CSP의 기본 필압 감도가 갤럭시 탭에 최적화되어 있지 않을 수 있다. 처음 설정 후 반드시 <strong>파일 → 환경설정 → 태블릿 → 필압 조정</strong>에서 실제로 선을 그어보며 본인의 손 힘에 맞게 조정해야 한다.
+  </div>
+
+  <!-- Image 2 - Real CSP brush settings screenshot -->
+  <div class="img-block">
+    <div class="img-cap">🖌️ CSP 브러시 세부 설정 패널 — 불투명도·경도 설정 예시</div>
+    <img src="https://www.clipstudio.net/wp-content/uploads/2019/08/0002_005_en-us.jpg" alt="CSP 브러시 세부 설정" loading="lazy" referrerpolicy="no-referrer">
+    <div class="img-src">출처: clipstudio.net &nbsp;·&nbsp; <a href="https://www.clipstudio.net/how-to-draw/archives/154262" target="_blank" style="color:#8866cc;text-decoration:none">🔗 원문 보기 →</a></div>
+  </div>
+
+  <p style="margin-top:16px;margin-bottom:8px"><strong style="color:#e8e8ff">딱딱한 브러시 vs 부드러운 브러시: 언제 무엇을 쓰는가?</strong></p>
+
+  <table class="brush-table">
+    <tr>
+      <th>브러시 종류</th>
+      <th>특성</th>
+      <th>스타레일/명조에서 사용 상황</th>
+    </tr>
+    <tr>
+      <td><strong style="color:#c4a8ff">G펜 (선화용)</strong></td>
+      <td>경계 선명, 불투명도 100%, 필압으로 굵기 변화</td>
+      <td>캐릭터 모든 윤곽선, 눈·코·입·머리카락 선화</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#c4a8ff">수채 평붓 → 플랫 채색용</strong></td>
+      <td>경계 선명, 필압 최소화, 불투명도 100% 고정</td>
+      <td>피부·의상·머리카락 베이스 단색 플랫 채색, 마스킹</td>
+    </tr>
+    <tr>
+      <td><strong style="color:#c4a8ff">에어브러시 → 그라데이션용</strong></td>
+      <td>경계 부드러움, 불투명도 30~60% 유동적</td>
+      <td>볼 홍조, 피부 그라데이션, 하늘 배경, 발광 효과</td>
+    </tr>
+  </table>
+
+  <div class="info">
+    <strong>스타레일/명조 스타일 특징:</strong> 두 게임 모두 <strong>플랫 채색 + 셀 쉐이딩</strong> 기반이다. 이는 "채색용 플랫 브러시"로 영역을 정확히 채운 뒤, 그라데이션 브러시로 부드러운 전환을 추가하는 방식이다. 초반에 이 두 브러시를 구분해서 익히는 것이 나중에 채색 레이어 관리에 결정적인 영향을 준다.
+  </div>
+</div>
+
+<!-- PRACTICE CARD -->
+<div class="card">
+  <div class="lbl">✏️ 실습 순서</div>
+  <div class="steps">
+
+    <div class="step">
+      <div class="snum">1</div>
+      <div class="scont">
+        <strong>1000×1000px, 350dpi 연습용 캔버스 생성</strong>
+        <div class="sub">
+          파일 → 신규 → 일러스트 선택.<br>
+          너비·높이 1000px, 해상도 350dpi, 기본 표현색 컬러로 설정.<br>
+          <strong>왜 350dpi인가?</strong> 72dpi는 화면 전용이고, 300~350dpi가 고화질 출력과 세밀한 선화 모두 커버한다. SNS에 올려도 품질 손실이 없다.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="snum">2</div>
+      <div class="scont">
+        <strong>도구 팔레트에서 G펜 찾기 → 5px·10px·15px 크기 테스트</strong>
+        <div class="sub">
+          도구 팔레트의 <span class="path" style="display:inline">펜</span> 클릭 → 서브 도구 팔레트에서 <strong>G펜</strong> 선택.<br>
+          도구 속성 팔레트에서 브러시 크기를 5 / 10 / 15px로 바꿔가며 각각 10개씩 자유롭게 선 긋기.<br>
+          필압을 약하게·중간·세게 달리하며 굵기 차이를 확인한다.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="snum">3</div>
+      <div class="scont">
+        <strong>필압 곡선 개인화 조정</strong>
+        <div class="sub">
+          <span class="path" style="display:inline">서브 도구 팔레트 → G펜 더블클릭 → 서브 도구 상세 열기</span><br>
+          왼쪽 항목에서 <strong>브러시 크기</strong> 클릭 → 오른쪽에 "필압" 아이콘(그래프 모양) 클릭 → 커브 그래프 편집.<br>
+          <strong>목표:</strong> 가볍게 누르면 가늘게(곡선 아래쪽 낮게), 세게 누르면 확실히 굵어지게(오른쪽 위 높게).<br>
+          조정 후 캔버스에서 같은 선을 다시 그어 차이를 비교한다.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="snum">4</div>
+      <div class="scont">
+        <strong>브러시 이름 변경 → "선화용_메인" + 즐겨찾기 등록</strong>
+        <div class="sub">
+          서브 도구 상세 패널 맨 위 이름 칸 클릭 → <strong>선화용_메인</strong> 입력 후 확인.<br>
+          서브 도구 팔레트에서 브러시 우클릭 → <strong>서브 도구를 즐겨찾기에 추가</strong> 선택.<br>
+          이렇게 하면 다음에 CSP를 열었을 때 즐겨찾기 탭에서 바로 불러올 수 있다.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="snum">5</div>
+      <div class="scont">
+        <strong>"수채 평붓" 찾기 → "채색용_플랫" 설정</strong>
+        <div class="sub">
+          도구 팔레트 <span class="path" style="display:inline">붓</span> → 서브 도구 팔레트에서 <strong>수채 → 수채 평붓</strong> 찾기.<br>
+          서브 도구 상세 열기:<br>
+          &nbsp;• <strong>브러시 크기:</strong> 필압 영향 최소화 (필압 아이콘 비활성화 또는 최솟값 올리기)<br>
+          &nbsp;• <strong>불투명도:</strong> 100% 고정, 필압 영향 끄기<br>
+          &nbsp;• <strong>경도:</strong> 100 (경계가 선명하게)<br>
+          이름을 <strong>채색용_플랫</strong>으로 변경 후 즐겨찾기 등록.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="snum">6</div>
+      <div class="scont">
+        <strong>"에어브러시" 찾기 → "채색용_그라데" 설정</strong>
+        <div class="sub">
+          도구 팔레트 <span class="path" style="display:inline">에어브러시</span> → 서브 도구 팔레트에서 <strong>부드러운 에어브러시</strong> 선택.<br>
+          서브 도구 상세 열기:<br>
+          &nbsp;• <strong>브러시 크기:</strong> 30~80px 범위, 필압으로 크기 조절 활성화<br>
+          &nbsp;• <strong>불투명도:</strong> 30~60% 범위로 설정, 필압에 따라 불투명도 변화<br>
+          &nbsp;• <strong>경도:</strong> 0~30 (경계가 흐릿하게 — 그라데이션 목적)<br>
+          이름을 <strong>채색용_그라데</strong>로 변경 후 즐겨찾기 등록.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="snum">7</div>
+      <div class="scont">
+        <strong>3종 브러시 전체 테스트 — A4 한 장 채우기</strong>
+        <div class="sub">
+          새 레이어를 3개 만들고 각 브러시로 다음을 그린다:<br>
+          &nbsp;• <strong>선화용_메인:</strong> 직선 10개(필압 변화), 곡선 10개, 원 5개 — 가는 선부터 굵은 선까지<br>
+          &nbsp;• <strong>채색용_플랫:</strong> 사각형 / 원 / 자유 형태 색 면 채우기<br>
+          &nbsp;• <strong>채색용_그라데:</strong> 색에서 흰색으로 자연스럽게 페이드되는 그라데이션 3개<br>
+          완성 후 3가지가 어떻게 다른지 확인하고 메모한다.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="info" style="margin-top:16px">
+    <strong>초보자가 여기서 막히는 포인트:</strong> "서브 도구 상세가 어디 있는지 모르겠다"는 경우가 많다. 서브 도구 팔레트 하단 오른쪽에 작은 <strong>렌치(공구) 아이콘</strong>을 클릭하면 열린다. 또는 브러시를 더블클릭해도 된다.
+  </div>
+</div>
+
+<!-- KEYWORDS -->
+<div class="kwrow">
+  <span class="kwlbl">🖼️ 참고 이미지 키워드</span>
+  <span class="tag">Clip Studio Paint brush settings anime linework</span>
+  <span class="tag">CSP G펜 설정 선화</span>
+  <span class="tag">CSP sub tool detail panel pressure</span>
+  <span class="tag">클립스튜디오 필압 조정 방법</span>
+</div>
+
+<!-- ASSIGNMENT -->
+<div class="assign">
+  <div class="lbl">📝 오늘의 과제</div>
+  <div class="atext">
+    <strong>3종 브러시 테스트 시트 스크린샷 제출</strong><br><br>
+    하나의 캔버스에 3개 레이어(선화용_메인 / 채색용_플랫 / 채색용_그라데)로 나눠 각 브러시를 테스트한 결과물을 스크린샷으로 제출한다.<br><br>
+    <strong style="color:#c4a8ff">필수 확인 항목:</strong>
+    <ul style="margin:10px 0 0 18px">
+      <li>선화용_메인에서 <strong>필압 약→강에 따른 굵기 변화</strong>가 보이는 선이 최소 5개</li>
+      <li>채색용_플랫으로 경계가 선명한 색 면이 있을 것</li>
+      <li>채색용_그라데로 흐릿하게 번지는 그라데이션이 있을 것</li>
+      <li>레이어 패널이 보이도록 스크린샷 (이름이 보여야 함)</li>
+    </ul>
+  </div>
+  <div style="background:rgba(74,170,128,.06);border:1px solid rgba(74,170,128,.25);border-radius:8px;padding:10px 14px;font-size:12px;color:#88ccaa">
+    ⏱ 예상 시간: 평일 3시간 (설정 1.5h + 테스트 드로잉 1.5h)
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>일러스트 강사봇 · 스타레일/명조 스타일 17주 과정</span>
+  <span>1주차 1일차 / 17주</span>
+</div>
+
+</div>
+</body>
+</html>
